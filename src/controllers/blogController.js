@@ -8,11 +8,14 @@ const createBlog = async function (req, res) {
   let authorPresence = await authorModel.findById(data.authorId);
    if (!authorPresence) return res.status(404).send({ status: false, msg: "author is not present" });
 
+   let isValid = mongoose.Types.ObjectId.isValid(authorID);
+   if (!isValid) return res.status(400).send({ status: false, message: "Invalid AuthoId" });
+
   let savedata = await blogModel.create(data);
-  res.send({ msg: savedata, status: true });
+  res.status(201).send({ msg: savedata, status: true });
 }
 catch (error) {
-   res.status(400).send({ msg: error.message });
+   res.status(400).send({ msg: error});
  }
 }
 

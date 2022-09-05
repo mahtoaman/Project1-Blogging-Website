@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 
+let validateEmail = function(email) {
+  var re = /^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/;
+  return re.test(email)
+};
+
 const authorSchema = new mongoose.Schema(
   {
     fname: {
@@ -12,21 +17,16 @@ const authorSchema = new mongoose.Schema(
     },
     title: {
       type: String,
-      enum: [Mr, Mrs, Miss],
+      enum: ["Mr", "Mrs", "Miss"],
       required: true,
     },
     email: {
       type: String,
-      unique: true,
       required: true,
-      validateEmail: (email) => {
-        return String(email)
-          .toLowerCase()
-          .match(
-            /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          );
-      },
-    },
+      unique: true,
+      validate: [validateEmail, 'Please fill a valid email address'],
+      match: [/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/, 'Please fill a valid email address']
+  },
     password: {
       type: String,
       required: true,
@@ -38,3 +38,11 @@ const authorSchema = new mongoose.Schema(
 module.exports = mongoose.model("author", authorSchema);
 
 //{ fname: { mandatory}, lname: {mandatory}, title: {mandatory, enum[Mr, Mrs, Miss]}, email: {mandatory, valid email, unique}, password: {mandatory} }
+
+// email: {
+//         type: String,
+//         required: true,
+//         unique: true,
+//         validate: [validateEmail, 'Please fill a valid email address'],
+//         match: [/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/, 'Please fill a valid email address']
+//     }

@@ -14,3 +14,4 @@ catch (error) {
  }
 }
 
+module.exports.createBlog = createBlog

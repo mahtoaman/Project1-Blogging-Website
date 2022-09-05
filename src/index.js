@@ -5,7 +5,7 @@ const route = require('./routes/route')
 const app = express();
 
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:true}))
+// app.use(bodyParser.urlencoded({extended:true}))
 
 
 mongoose.connect("mongodb+srv://amanmahto:anuragf45@bloggingwebsite.t7a0mo0.mongodb.net/Blogging-Website?retryWrites=true&w=majority",{

@@ -1,0 +1,15 @@
+const blogModel = require("../models/blogModel");
+
+const createBlog = async function (req, res) {
+  try{
+  let data = req.body;
+  let authorPresence = await authorModel.findById(data.authorId);
+   if (!authorPresence) return res.status(404).send({ status: false, msg: "author is not present" });
+  let savedata = await blogModel.create(data);
+  res.send({ msg: savedata, status: true });
+}
+catch (error) {
+   res.status(500).send({ msg: error.message });
+ }
+
+module.exports.createBlog = createBlog;

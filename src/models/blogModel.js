@@ -12,13 +12,15 @@ const blogSchema = new mongoose.Schema(
       type: String,
       reuired: true,
     },
-    authorId: { type: ObjectId, ref: authorModel },
+    authorId: { type: ObjectId, 
+      ref: author
+     },
     tags: {
       type: [String],
     },
     category: { type: String, required: true },
     subcategory: { type: [String] },
-    // createdAt, updatedAt, ---will be handled by timestamp
+
     deletedAt: {
       type: String,
     },

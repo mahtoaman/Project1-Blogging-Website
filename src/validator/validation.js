@@ -1,4 +1,7 @@
+const { default: mongoose } = require("mongoose");
+
 //E-Mail validator
+
 const isValidEmail = function (mail) {
   if (/^\w+([\.-]?\w+)@\w+([\.-]?\w+)(\.\w{2,3})+$/.test(mail)) {
     return true;
@@ -12,4 +15,12 @@ const isValidBody = function (data) {
 
 // console.log(isValidBody(data))
 
-module.exports = { isValidEmail, isValidBody };
+const isValidId = function (data) {
+  return mongoose.Types.ObjectId.isValid(data);
+};
+
+module.exports = { isValidEmail, isValidBody, isValidId };
+
+//first name validation
+
+//

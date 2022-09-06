@@ -91,7 +91,6 @@ const updateBlog = async function (req, res) {
             body: body,
             tags: tags,
             subcategory: subCategory,
-            publishedAt: new Date(),
           },
         },
         //this line will update according to data provided in the request boddy if data is not provided then it will not update that value

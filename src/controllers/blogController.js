@@ -34,7 +34,7 @@ const createBlog = async function (req, res) {
   }
 };
 
-//==================== GET BLOG FUNCTION (upendra)==========================
+//==================== GET BLOG FUNCTION (upendra) ==========================
 
 const getBlog = async function (req, res) {
   try {
@@ -45,9 +45,9 @@ const getBlog = async function (req, res) {
       $and: [data, { isDeleted: false }, { isPublished: true }],
     });
 
-    if (!allelement) return res.status(404).send({ status: false, msg: "Data not found" });
+    if (allelement.length==0) return res.status(404).send({ status: false, msg: "Data not found" });
       
-     return res.status(200).send({ status: true, msg: allelement });
+  return res.status(200).send({ status: true, msg: allelement });
   } catch (error) {
     res.status(500).send({ status: false, msg: error.message });
   }
@@ -58,17 +58,15 @@ const getBlog = async function (req, res) {
 const updateBlog = async function (req, res) {
   try {
     let data = req.body;
-    // let title = req.body.title
-    console.log(data);
+    // console.log(data);
     let blogId = req.params["blogId"];
-    console.log(blogId);
+    // console.log(blogId);
     let { title, body, tags, subCategory } = data;
 
-    // let isValid = mongoose.Types.ObjectId.isValid(blogId);
-    if (validator.isValidId(blogId))
+    if (!validator.isValidId(blogId))
       return res
         .status(400)
-        .send({ status: false, message: "Not a valid Author ID" });
+        .send({ status: false, message: "Not a valid blogId" });
 
     let checkBlog = await blogModel.findOne({ _id: blogId });
     if (!checkBlog)
@@ -108,25 +106,22 @@ const deletBlogById = async function (req, res) {
   try {
     let Id = req.params.blogId;
 
-    // let isValid = mongoose.Types.ObjectId.isValid(Id);
-    if (validator.isValidId(Id))
+    if (!validator.isValidId(Id))
       return res.status(400).send({ status: false, msg: "Invalid blogId" });
 
     let check = await blogModel.findById(Id);
-    if (!check)
-      return res.status(404).send({ status: false, msg: "Invalid blogId" });
+    if (!check) return res.status(404).send({ status: false, msg: "No blog found with given blogId" });
 
-    if (check.isDeleted)
-      return res.status(404).send({ status: false, msg: "Blog not found" });
+    if (check.isDeleted) return res.status(404).send({ status: false, msg: "Blog not found" });
 
     let updatedata = await blogModel.findByIdAndUpdate(
       Id,
       { $set: { isDeleted: true, deletedAt: new Date() } },
       { new: true }
     );
-    res.status(200).send({ data: updatedata, status: true });
+    res.status(200).send({ status: true , data: updatedata});
   } catch (error) {
-    res.status(500).send({ msg: error.message, status: false });
+    res.status(500).send({status: false , msg: error.message });
   }
 };
 

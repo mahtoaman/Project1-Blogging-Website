@@ -84,11 +84,11 @@ const updateBlog = async function (req, res) {
       let updatedValues = await blogModel.findOneAndUpdate(
         { _id: blogId },
         {
-          $set: {
-            title: title,
-            body: body,
+          $push: {
             tags: tags,
-            subcategory: subCategory,
+            subcategory: subCategory},
+             $set:{title: title,
+            body: body,
             isPublished:true,
             publishedAt:new Date()
           },

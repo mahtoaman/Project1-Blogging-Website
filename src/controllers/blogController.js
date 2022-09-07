@@ -2,7 +2,7 @@ const validator = require("../validator/validation");
 const blogModel = require("../models/blogModel");
 const authorModel = require("../models/authorModel");
 
-//==================== CREATE BLOG FUNCTION (aman)==========================
+//==================== CREATE BLOG FUNCTION ==========================
 
 const createBlog = async function (req, res) {
   try {
@@ -46,7 +46,7 @@ const createBlog = async function (req, res) {
         .send({ statut: false, msg: "Body is a mandatory part" });
 
     //content should be more than 100 characters
-    if (body.length<100)
+    if (body.length < 100)
       return res
         .status(400)
         .send({ statut: false, msg: "Body is a mandatory part" });
@@ -55,7 +55,8 @@ const createBlog = async function (req, res) {
     if (!category || category.length == 0)
       return res.status(400).send({ statut: false, msg: "Category is must" });
 
-    data["createdAt"] = new Date(); //adding the key Created at to the data, so that we can log this data in collection
+    //adding the key Created at to the data, so that we can log this data in collection
+    data["createdAt"] = new Date();
     let savedata = await blogModel.create(data);
     if (isPublished) {
       let updateDate = await blogModel.findOneAndUpdate(
@@ -71,39 +72,44 @@ const createBlog = async function (req, res) {
   }
 };
 
-//==================== GET BLOG FUNCTION (upendra) ==========================
+//==================== GET BLOG FUNCTION ==========================
 
 const getBlog = async function (req, res) {
   try {
     let data = req.query;
-    if (data.authorId) {
-      if (!validator.isValidId(data.authorId))
-        return res.status(400).send({ status: false, msg: "Invalid authorId" });
+    let { authorId } = data;
+
+    //edgeCase -- if authorId is given then is it valid or not
+    if (authorId) {
+      if (!validator.isValidId(authorId))
+        return res
+          .status(400)
+          .send({ status: false, msg: "Not a valid authorId" });
     }
 
-    let allelement = await blogModel.find({
+    let allElement = await blogModel.find({
       $and: [data, { isDeleted: false }, { isPublished: true }],
     });
 
-    if (allelement.length == 0)
+    if (allElement.length == 0)
       return res.status(404).send({ status: false, msg: "Data not found" });
 
-    return res.status(200).send({ status: true, msg: allelement });
+    return res.status(200).send({ status: true, msg: allElement });
   } catch (error) {
     res.status(500).send({ status: false, msg: error.message });
   }
 };
 
-//==================== UPDATE BLOG FUNCTION (aman)==========================
+//==================== UPDATE BLOG FUNCTION ==========================
 
 const updateBlog = async function (req, res) {
   try {
     let data = req.body;
-    // console.log(data);
     let blogId = req.params["blogId"];
-    // console.log(blogId);
+
     let { title, body, tags, subCategory } = data;
 
+    //edgeCase 1 --is validBlogId
     if (!validator.isValidId(blogId))
       return res
         .status(400)
@@ -113,14 +119,18 @@ const updateBlog = async function (req, res) {
     if (!checkBlog)
       return res
         .status(400)
-        .send({ status: false, msg: "No blog found with given Id" });
+        .send({ status: false, msg: "No blog found with given Id to update" });
 
+    //edgeCase 2 --is emptyBody
     let emptyBody = validator.isValidBody(data);
     if (!emptyBody)
       return res
         .status(400)
         .send({ status: false, msg: "You have not provided any data" });
 
+    //updating the blogs with given data
+    //this line will update according to data provided in the request boddy
+    //if data is not provided then it will not update that value
     if (title || body || tags || subCategory) {
       let updatedValues = await blogModel.findOneAndUpdate(
         { _id: blogId },
@@ -137,7 +147,6 @@ const updateBlog = async function (req, res) {
             publishedAt: new Date(),
           },
         },
-        //this line will update according to data provided in the request boddy if data is not provided then it will not update that value
         { new: true }
       );
       res.status(200).send({ status: true, data: updatedValues });
@@ -153,17 +162,24 @@ const deletBlogById = async function (req, res) {
   try {
     let Id = req.params.blogId;
 
+    //edgeCase1 -- is valid blodId
     if (!validator.isValidId(Id))
       return res.status(400).send({ status: false, msg: "Invalid blogId" });
 
+    //is blog present with given blogId
     let check = await blogModel.findById(Id);
     if (!check)
-      return res
-        .status(404)
-        .send({ status: false, msg: "No blog found with given blogId" });
+      return res.status(404).send({
+        status: false,
+        msg: "No blog found with given blogId to delete blogs",
+      });
 
+    // is it already deleted??
     if (check.isDeleted)
-      return res.status(404).send({ status: false, msg: "Blog not found" });
+      return res.status(404).send({
+        status: false,
+        msg: "Blog not found may you have already delted :)",
+      });
 
     let updatedata = await blogModel.findByIdAndUpdate(
       Id,
@@ -182,6 +198,10 @@ const deleteBlog = async function (req, res) {
   try {
     let data = req.query;
 
+    //edgeCase1 --is queryParam empty??
+    //if not empty then add a key to "data", "isDeleted" and setting value to trye
+    //to get only blogs which is not deleted yet
+
     if (validator.isValidQuery(data)) {
       data["isDeleted"] = false;
     } else {
@@ -190,11 +210,14 @@ const deleteBlog = async function (req, res) {
         msg: "Please enter at least one query to delete the blog",
       });
     }
+
+    //if authorId is given then given then check is it vlid or not
     if (data.authorId) {
       if (!validator.isValidId(data.authorId))
         return res.status(400).send({ status: false, msg: "Invalid authorId" });
     }
 
+    //now delete the blogs with provided details
     let deleteByQuery = await blogModel.updateMany(
       data,
       {
@@ -203,11 +226,14 @@ const deleteBlog = async function (req, res) {
       { new: true }
     );
 
+    //is modified count zero....then sending response- no blogs to delete
     if (deleteByQuery.modifiedCount == 0) {
       return res
         .status(404)
         .send({ status: false, msg: "No blogs to delete with given queries" });
-    } else {
+    }
+    //if modified count is greater than zero then return modified count with message
+    else {
       return res.status(200).send({
         status: true,
         msg: `${deleteByQuery.modifiedCount} Blogs deleted with given queries`,
@@ -218,8 +244,8 @@ const deleteBlog = async function (req, res) {
   }
 };
 
-module.exports.createBlog = createBlog; 
-module.exports.getBlog = getBlog; 
-module.exports.updateBlog = updateBlog; 
-module.exports.deletBlogById = deletBlogById; 
-module.exports.deleteBlog = deleteBlog; 
+module.exports.createBlog = createBlog;
+module.exports.getBlog = getBlog;
+module.exports.updateBlog = updateBlog;
+module.exports.deletBlogById = deletBlogById;
+module.exports.deleteBlog = deleteBlog;

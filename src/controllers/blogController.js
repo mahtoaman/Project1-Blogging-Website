@@ -8,30 +8,48 @@ const createBlog = async function (req, res) {
   try {
     let data = req.body;
     // let published = data.isPublished;
-    let { isPublished, authorId } = data;
+    let { authorId, title, body, category, isPublished } = data;
 
-    if (!validator.isValidBody(data)) { //checking that body is empty or not
+    if (!validator.isValidBody(data)) {
+      //checking that body is empty or not
       return res
         .status(400)
         .send({ status: false, msg: "Please input detait is required" });
     }
-    if (!authorId) //edgeCase1 - checks if authorId is provided in body or not
+    if (!authorId)
+      //edgeCase1 - checks if authorId is provided in body or not (authorCase1)
       return res
         .status(400)
-        .send({ statut: false, msg: "AuthorId is require" });
+        .send({ statut: false, msg: "AuthorId is required" });
 
-    if (!validator.isValidId(authorId))  // edgeCase2- provided authorId is correct or not
+    if (!validator.isValidId(authorId))
+      // edgeCase2- provided authorId is correct or not (authorCase2)
       return res
         .status(400)
         .send({ status: false, message: "Invalid AuthoId" });
 
-    let authorPresence = await authorModel.findById(authorId); //edgeCase3 - if authorId is correct then, is there any author present with given id or not
+    //edgeCase3 - (authorCase3) if authorId is correct then, is there any author present with given id or not
+    let authorPresence = await authorModel.findById(authorId);
     if (!authorPresence)
       return res
         .status(404)
         .send({ status: false, msg: "Author is not present" });
 
-    data['createdAt'] = new Date() //adding the key Created at to the data, so that we can log this data in collection
+    //edgeCase4 - is title present or not
+    if (!title)
+      return res.status(400).send({ statut: false, msg: "Title is required" });
+
+    //edgeCase5 - is body data present or not
+    if (!body)
+      return res
+        .status(400)
+        .send({ statut: false, msg: "Body is a mandatory part" });
+
+    //edgeCase5 - is body data present or not
+    if (!category || category.length == 0)
+      return res.status(400).send({ statut: false, msg: "Category is must" });
+
+    data["createdAt"] = new Date(); //adding the key Created at to the data, so that we can log this data in collection
     let savedata = await blogModel.create(data);
     if (isPublished) {
       let updateDate = await blogModel.findOneAndUpdate(
@@ -160,12 +178,10 @@ const deleteBlog = async function (req, res) {
     if (validator.isValidQuery(data)) {
       data["isDeleted"] = false;
     } else {
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "Please enter at least one query to delete the blog",
-        });
+      return res.status(400).send({
+        status: false,
+        msg: "Please enter at least one query to delete the blog",
+      });
     }
     if (data.authorId) {
       if (!validator.isValidId(data.authorId))
@@ -185,12 +201,10 @@ const deleteBlog = async function (req, res) {
         .status(404)
         .send({ status: false, msg: "No blogs to delete with given queries" });
     } else {
-      return res
-        .status(200)
-        .send({
-          status: true,
-          msg: `${deleteByQuery.modifiedCount} Blogs deleted with given queries`,
-        });
+      return res.status(200).send({
+        status: true,
+        msg: `${deleteByQuery.modifiedCount} Blogs deleted with given queries`,
+      });
     }
   } catch (error) {
     res.status(400).send({ msg: error.message });

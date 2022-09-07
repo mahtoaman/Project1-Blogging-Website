@@ -43,13 +43,25 @@ const createAuthor = async function (req, res) {
         });
     }
 
-    //edgeCase 4 -- is first name valid
+    //edgeCase 4 -- is title valid
     if (!title)
       return res
         .status(400)
         .send({ status: false, msg: "You're missing title :)" });
 
-    // console.log('34')
+    //edgeCase 4.1 --
+    let validTitle = ["Mr", "Mrs", "Miss"];
+    let checkTitle = false;
+    for (let i = 0; i < validTitle.length; i++) {
+      if (title == validTitle[i]) checkTitle = true;
+      break;
+    }
+    if (!checkTitle)
+      return res
+        .status(400)
+        .send({ status: false, msg: `Title can contain only "Mr","Mrs" or "Miss` });
+    
+
     //edgeCase 5 --is e-mail id present and valid
     if (!email) {
       return res

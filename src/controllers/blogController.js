@@ -7,23 +7,33 @@ const authorModel = require("../models/authorModel");
 const createBlog = async function (req, res) {
   try {
     let data = req.body;
-    let published = data.isPublished;
-    console.log(data.authorId);
-    if(!validator.isValidBody(data)){return res.status(400).send({status: false,msg:"please input detait is required"})}
-    if(!data.authorId) return  res.status(400).send({statut:false, msg:'authorId is require'})
-     
-if (!validator.isValidId(data.authorId))
+    // let published = data.isPublished;
+    let { isPublished, authorId } = data;
+
+    if (!validator.isValidBody(data)) { //checking that body is empty or not
+      return res
+        .status(400)
+        .send({ status: false, msg: "Please input detait is required" });
+    }
+    if (!authorId) //edgeCase1 - checks if authorId is provided in body or not
+      return res
+        .status(400)
+        .send({ statut: false, msg: "AuthorId is require" });
+
+    if (!validator.isValidId(authorId))  // edgeCase2- provided authorId is correct or not
       return res
         .status(400)
         .send({ status: false, message: "Invalid AuthoId" });
 
-    let authorPresence = await authorModel.findById(data.authorId);
+    let authorPresence = await authorModel.findById(authorId); //edgeCase3 - if authorId is correct then, is there any author present with given id or not
     if (!authorPresence)
       return res
         .status(404)
-        .send({ status: false, msg: "author is not present" });
+        .send({ status: false, msg: "Author is not present" });
+
+    data['createdAt'] = new Date() //adding the key Created at to the data, so that we can log this data in collection
     let savedata = await blogModel.create(data);
-    if (published) {
+    if (isPublished) {
       let updateDate = await blogModel.findOneAndUpdate(
         data,
         { $set: { publishedAt: new Date() } },
@@ -41,18 +51,20 @@ if (!validator.isValidId(data.authorId))
 
 const getBlog = async function (req, res) {
   try {
-    
     let data = req.query;
-    if(data.authorId){
-    if (!validator.isValidId(data.authorId)) return res.status(400).send({ status: false, msg:"Invalid authorId"})};
+    if (data.authorId) {
+      if (!validator.isValidId(data.authorId))
+        return res.status(400).send({ status: false, msg: "Invalid authorId" });
+    }
 
     let allelement = await blogModel.find({
       $and: [data, { isDeleted: false }, { isPublished: true }],
     });
 
-    if (allelement.length==0) return res.status(404).send({ status: false, msg: "Data not found" });
-      
-  return res.status(200).send({ status: true, msg: allelement });
+    if (allelement.length == 0)
+      return res.status(404).send({ status: false, msg: "Data not found" });
+
+    return res.status(200).send({ status: true, msg: allelement });
   } catch (error) {
     res.status(500).send({ status: false, msg: error.message });
   }
@@ -91,11 +103,13 @@ const updateBlog = async function (req, res) {
         {
           $push: {
             tags: tags,
-            subcategory: subCategory},
-             $set:{title: title,
+            subcategory: subCategory,
+          },
+          $set: {
+            title: title,
             body: body,
-            isPublished:true,
-            publishedAt:new Date()
+            isPublished: true,
+            publishedAt: new Date(),
           },
         },
         //this line will update according to data provided in the request boddy if data is not provided then it will not update that value
@@ -118,18 +132,22 @@ const deletBlogById = async function (req, res) {
       return res.status(400).send({ status: false, msg: "Invalid blogId" });
 
     let check = await blogModel.findById(Id);
-    if (!check) return res.status(404).send({ status: false, msg: "No blog found with given blogId" });
+    if (!check)
+      return res
+        .status(404)
+        .send({ status: false, msg: "No blog found with given blogId" });
 
-    if (check.isDeleted) return res.status(404).send({ status: false, msg: "Blog not found" });
+    if (check.isDeleted)
+      return res.status(404).send({ status: false, msg: "Blog not found" });
 
     let updatedata = await blogModel.findByIdAndUpdate(
       Id,
       { $set: { isDeleted: true, deletedAt: new Date() } },
       { new: true }
     );
-    res.status(200).send({ status: true , data: updatedata});
+    res.status(200).send({ status: true, data: updatedata });
   } catch (error) {
-    res.status(500).send({status: false , msg: error.message });
+    res.status(500).send({ status: false, msg: error.message });
   }
 };
 
@@ -139,32 +157,48 @@ const deleteBlog = async function (req, res) {
   try {
     let data = req.query;
 
-    if(validator.isValidQuery(data)){
-       data['isDeleted'] = false
+    if (validator.isValidQuery(data)) {
+      data["isDeleted"] = false;
+    } else {
+      return res
+        .status(400)
+        .send({
+          status: false,
+          msg: "Please enter at least one query to delete the blog",
+        });
     }
-    else{
-      return res.status(400).send({ status: false, msg: "Please enter at least one query to delete the blog" });
+    if (data.authorId) {
+      if (!validator.isValidId(data.authorId))
+        return res.status(400).send({ status: false, msg: "Invalid authorId" });
     }
-    if(data.authorId){
-    if (!validator.isValidId(data.authorId))
-      return res.status(400).send({ status: false, msg: "Invalid authorId" })};
 
-    let deleteByQuery = await blogModel.updateMany(data, {
-      $set: { isDeleted: true, deletedAt: new Date()},},{new:true});
+    let deleteByQuery = await blogModel.updateMany(
+      data,
+      {
+        $set: { isDeleted: true, deletedAt: new Date() },
+      },
+      { new: true }
+    );
 
     if (deleteByQuery.modifiedCount == 0) {
-      return res.status(404).send({status:false, msg: "No blogs to delete with given queries" });
-    } 
-    else {
-      return res.status(200).send({status:true, msg: `${deleteByQuery.modifiedCount} Blogs deleted with given queries` });
+      return res
+        .status(404)
+        .send({ status: false, msg: "No blogs to delete with given queries" });
+    } else {
+      return res
+        .status(200)
+        .send({
+          status: true,
+          msg: `${deleteByQuery.modifiedCount} Blogs deleted with given queries`,
+        });
     }
   } catch (error) {
     res.status(400).send({ msg: error.message });
   }
 };
 
-module.exports.createBlog = createBlog;       //aman
-module.exports.getBlog = getBlog;             //upendra
-module.exports.updateBlog = updateBlog;       //AMAN
+module.exports.createBlog = createBlog; //aman
+module.exports.getBlog = getBlog; //upendra
+module.exports.updateBlog = updateBlog; //AMAN
 module.exports.deletBlogById = deletBlogById; //saurav
-module.exports.deleteBlog = deleteBlog;       //dev
+module.exports.deleteBlog = deleteBlog; //dev

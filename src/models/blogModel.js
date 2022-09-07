@@ -33,13 +33,19 @@ const blogSchema = new mongoose.Schema(
     publishedAt: {
       type: String,
     },
+    createdAt: {
+      type: String,
+    },
+    updatedAt: {
+      type: String,
+    },
 
     isPublished: {
       type: Boolean,
       default: false,
     },
-  },
-  { timestamps: true }
+  }
+  // { timestamps: true }
 );
 
 module.exports = mongoose.model("blog", blogSchema);

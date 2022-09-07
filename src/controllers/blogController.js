@@ -9,7 +9,10 @@ const createBlog = async function (req, res) {
     let data = req.body;
     let published = data.isPublished;
     console.log(data.authorId);
-    if (!validator.isValidId(data.authorId))
+    if(!validator.isValidBody(data)){return res.status(400).send({status: false,msg:"please input detait is required"})}
+    if(!data.authorId) return  res.status(400).send({statut:false, msg:'authorId is require'})
+     
+if (!validator.isValidId(data.authorId))
       return res
         .status(400)
         .send({ status: false, message: "Invalid AuthoId" });

@@ -6,11 +6,11 @@ const blogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
+     // required: true,
     },
     body: {
       type: String,
-      reuired: true,
+      //reuired: true,
     },
     authorId: { type: ObjectId, 
       ref: 'author'

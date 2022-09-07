@@ -12,8 +12,8 @@ const isValidPassword = function (pass) {
   if (/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*])[a-zA-Z0-9!@#$%^&*]{8,32}$/.test(pass)) return true;
   return false
 };
-let pass = 'AMANa@1231'
-console.log(isValidPassword(pass))
+// let pass = 'AMANa@1231'
+// console.log(isValidPassword(pass))
 
 //name validation
 const isValidName = function(name){

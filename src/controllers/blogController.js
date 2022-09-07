@@ -45,6 +45,12 @@ const createBlog = async function (req, res) {
         .status(400)
         .send({ statut: false, msg: "Body is a mandatory part" });
 
+    //content should be more than 100 characters
+    if (body.length<100)
+      return res
+        .status(400)
+        .send({ statut: false, msg: "Body is a mandatory part" });
+
     //edgeCase5 - is body data present or not
     if (!category || category.length == 0)
       return res.status(400).send({ statut: false, msg: "Category is must" });
@@ -61,7 +67,7 @@ const createBlog = async function (req, res) {
     }
     res.status(201).send({ msg: savedata, status: true });
   } catch (error) {
-    res.status(400).send({ msg: error });
+    res.status(500).send({ msg: error.message });
   }
 };
 
@@ -126,6 +132,7 @@ const updateBlog = async function (req, res) {
           $set: {
             title: title,
             body: body,
+            updatedAt: new Date(),
             isPublished: true,
             publishedAt: new Date(),
           },
@@ -140,7 +147,7 @@ const updateBlog = async function (req, res) {
   }
 };
 
-//====================== DELETE BLOG BY BLOGID (saurav)========================
+//====================== DELETE BLOG BY BLOGID ========================
 
 const deletBlogById = async function (req, res) {
   try {
@@ -169,7 +176,7 @@ const deletBlogById = async function (req, res) {
   }
 };
 
-//====================== DELETE BLOG (DEV)========================
+//====================== DELETE BLOG ========================
 
 const deleteBlog = async function (req, res) {
   try {
@@ -211,8 +218,8 @@ const deleteBlog = async function (req, res) {
   }
 };
 
-module.exports.createBlog = createBlog; //aman
-module.exports.getBlog = getBlog; //upendra
-module.exports.updateBlog = updateBlog; //AMAN
-module.exports.deletBlogById = deletBlogById; //saurav
-module.exports.deleteBlog = deleteBlog; //dev
+module.exports.createBlog = createBlog; 
+module.exports.getBlog = getBlog; 
+module.exports.updateBlog = updateBlog; 
+module.exports.deletBlogById = deletBlogById; 
+module.exports.deleteBlog = deleteBlog; 

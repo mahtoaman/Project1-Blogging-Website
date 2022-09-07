@@ -87,11 +87,11 @@ const createAuthor = async function (req, res) {
       return res
         .status(400)
         .send({ status: false, msg: "Password is required" });
-
+//edgeCase7 --checking password or valid or not
     if (!validator.isValidPassword(password))
       return res.status(400).send({
         status: false,
-        msg: "Password must contain minimum eight characters, at least one letter, one number and one special character:",
+        msg: "Password must contain minimum eight characters, at least one upperCase nad lowerCase letter, one number and one special character:",
       });
 
     let savedata = await authorModel.create(data);

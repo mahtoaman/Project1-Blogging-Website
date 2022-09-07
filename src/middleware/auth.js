@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModel");
-const { isValidBody, isValidId } = require("../validator/validation");
+const { isValidId } = require("../validator/validation");
 
 const authenticate = async function (req, res, next) {
   try {
@@ -19,7 +19,7 @@ const authenticate = async function (req, res, next) {
         .status(400)
         .send({ status: false, message: "Not a Valid Token" });
     }
-   return next();
+    return next();
   } catch (error) {
     return res.status(500).send({ status: false, message: error.message });
   }
@@ -43,12 +43,10 @@ const autherization = async function (req, res, next) {
 
     //veryfing authorization
     if (authorId != decodedToken.authorId) {
-      return res
-        .status(403)
-        .send({
-          status: false,
-          message: "You are not a authorized to perfom this operation",
-        });
+      return res.status(403).send({
+        status: false,
+        message: "You are not a authorized to perfom this operation",
+      });
     }
     //if auhtorId from blog and authorId from decodedToken are same...then returning control to next function
     return next();

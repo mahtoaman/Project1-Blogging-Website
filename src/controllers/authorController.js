@@ -137,26 +137,13 @@ const loginAuthor = async function (req, res) {
       });
 
     //check if password is correct or not
-    let checkData = await authorModel.findOne({email: emailId });
+    let checkData = await authorModel.findOne({ email: emailId });
     if (password != checkData.password)
       return res.status(404).send({
         status: false,
         msg: "Password is incorrect",
       });
 
-    //edgeCase5 -- is author present with given credentials or not
-    // let author = await authorModel.findOne({
-    //   email: emailId,
-    //   password: password,
-    // });
-
-    // if (!author) {
-    //   return res.status(404).send({
-    //     status: false,
-    //     msg: "Author not found with given credentials",
-    //   });
-    // }
-    //if eveything is fine the generationg the token
     let createToken = jwt.sign(
       {
         authorId: checkData._id.toString(),

@@ -89,6 +89,8 @@ const updateBlog = async function (req, res) {
             body: body,
             tags: tags,
             subcategory: subCategory,
+            isPublished:true,
+            publishedAt:new Date()
           },
         },
         //this line will update according to data provided in the request boddy if data is not provided then it will not update that value
@@ -102,6 +104,7 @@ const updateBlog = async function (req, res) {
 };
 
 //====================== DELETE BLOG BY BLOGID (saurav)========================
+
 const deletBlogById = async function (req, res) {
   try {
     let Id = req.params.blogId;
@@ -130,26 +133,33 @@ const deletBlogById = async function (req, res) {
 const deleteBlog = async function (req, res) {
   try {
     let data = req.query;
-    let checkBlog = await blogModel.find(data);
-    console.log(checkBlog);
 
-    if (checkBlog.isDeleted) return res.status(400).send({ status: false, msg: "Blog not found" });
+    if(validator.isValidQuery(data)){
+       data['isDeleted'] = false
+    }
+    else{
+      return res.status(400).send({ status: false, msg: "Please enter at least one query to delete the blog" });
+    }
+    if(data.authorId){
+    if (!validator.isValidId(data.authorId))
+      return res.status(400).send({ status: false, msg: "Invalid authorId" })};
 
     let deleteByQuery = await blogModel.updateMany(data, {
       $set: { isDeleted: true, deletedAt: new Date()},},{new:true});
 
-    if (!deleteByQuery) {
-      return res.status(404).send({ msg: "Blog not found" });
-    } else {
-      res.status(200).send({ msg: deleteByQuery });
+    if (deleteByQuery.modifiedCount == 0) {
+      return res.status(404).send({status:false, msg: "No blogs to delete with given queries" });
+    } 
+    else {
+      return res.status(200).send({status:true, msg: `${deleteByQuery.modifiedCount} Blogs deleted with given queries` });
     }
   } catch (error) {
     res.status(400).send({ msg: error.message });
   }
 };
 
-module.exports.createBlog = createBlog; //aman
-module.exports.getBlog = getBlog; //upendra
-module.exports.updateBlog = updateBlog; //AMAN
+module.exports.createBlog = createBlog;       //aman
+module.exports.getBlog = getBlog;             //upendra
+module.exports.updateBlog = updateBlog;       //AMAN
 module.exports.deletBlogById = deletBlogById; //saurav
-module.exports.deleteBlog = deleteBlog; //dev
+module.exports.deleteBlog = deleteBlog;       //dev

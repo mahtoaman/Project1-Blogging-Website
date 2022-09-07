@@ -11,6 +11,10 @@ const isValidEmail = function (mail) {
 // let data = {"name":5}
 const isValidBody = function (data) {
   return Object.keys(data).length > 0;
+}
+;
+const isValidQuery = function (data) {
+  return Object.keys(data).length > 0;
 };
 
 // console.log(isValidBody(data))
@@ -19,7 +23,7 @@ const isValidId = function (data) {
   return mongoose.Types.ObjectId.isValid(data);
 };
 
-module.exports = { isValidEmail, isValidBody, isValidId };
+module.exports = { isValidEmail, isValidBody, isValidId, isValidQuery};
 
 //first name validation
 

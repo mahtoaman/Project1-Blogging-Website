@@ -38,8 +38,10 @@ const createBlog = async function (req, res) {
 
 const getBlog = async function (req, res) {
   try {
+    
     let data = req.query;
-    if (!validator.isValidId(data.authorId)) return res.status(400).send({ status: false, msg:"Invalid authorId"});
+    if(data.authorId){
+    if (!validator.isValidId(data.authorId)) return res.status(400).send({ status: false, msg:"Invalid authorId"})};
 
     let allelement = await blogModel.find({
       $and: [data, { isDeleted: false }, { isPublished: true }],

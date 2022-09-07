@@ -1,6 +1,6 @@
 const authorModel = require("../models/authorModel");
 const validator = require("../validator/validation");
-const jwt =require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
 const createAuthor = async function (req, res) {
   try {
@@ -52,12 +52,10 @@ const createAuthor = async function (req, res) {
 
     //edgeCase 4.1 --is title acc
     if (title != "Mr" && title != "Mrs" && title != "Miss")
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: `Title can contain only "Mr","Mrs" or "Miss`,
-        });
+      return res.status(400).send({
+        status: false,
+        msg: `Title can contain only "Mr","Mrs" or "Miss`,
+      });
 
     //edgeCase 5 --is e-mail id present and valid
     if (!email) {
@@ -82,18 +80,19 @@ const createAuthor = async function (req, res) {
           .send({ status: false, msg: "Provided email is already registered" });
 
     // edgeCase 6 -- checking validation of password
-    console.log(validator.isValidPassword(password));
     if (!password)
       return res
         .status(400)
         .send({ status: false, msg: "Password is required" });
-//edgeCase7 --checking password or valid or not
+
+    //edgeCase7 --checking password or valid or not
     if (!validator.isValidPassword(password))
       return res.status(400).send({
         status: false,
         msg: "Password must contain minimum eight characters, at least one upperCase nad lowerCase letter, one number and one special character:",
       });
 
+    //creating collection
     let savedata = await authorModel.create(data);
     res.status(201).send({
       status: "Congratulations, your data is created",
@@ -104,36 +103,52 @@ const createAuthor = async function (req, res) {
   }
 };
 
-
-//AUTHENTICATION 
+//==========================================AUTHENTICATION================================================================
 
 const loginAuthor = async function (req, res) {
   try {
     let emailId = req.body.email;
     let password = req.body.password;
 
-    if (!validator.isValidEmail(emailId)) {
-      return res.status(400).send({ status: false, msg: "Email is Invalid" });
-    }
-    if (!emailId) {
+    //edgeCase1 - is email id present or not
+    if (!emailId)
       return res
         .status(400)
         .send({ status: false, msg: "Email Id is required" });
-    }
 
-    if (!password) {
-      return res.status(400).send({ status: false, msg: "Password is must" });
-    }
+    //edgeCase2 --is valid email syntax
+    if (!validator.isValidEmail(emailId))
+      return res.status(400).send({
+        status: false,
+        msg: "This is not a valid syntax for email id, plsease try again",
+      });
 
+    //edgeCase3 -- is password given
+    if (!password)
+      return res
+        .status(400)
+        .send({ status: false, msg: "Password is required" });
+
+    //edgeCase4 -- is valid syntax of password
+    if (!validator.isValidPassword(password))
+      return res.status(400).send({
+        status: false,
+        msg: "Password must contain minimum eight characters, at least one upperCase nad lowerCase letter, one number and one special character:",
+      });
+
+    //edgeCase5 -- is author present with given credentials or not
     let author = await authorModel.findOne({
       email: emailId,
       password: password,
     });
-    console.log(author);
-    if (!author) {
-      return res.status(404).send({ status: false, msg: "Author not found" });
-    }
 
+    if (!author) {
+      return res.status(404).send({
+        status: false,
+        msg: "Author not found with given credentials",
+      });
+    }
+    //if eveything is fine the generationg the token
     let createToken = jwt.sign(
       {
         authorId: author._id.toString(),
@@ -142,9 +157,9 @@ const loginAuthor = async function (req, res) {
       },
       "authors-secret-key"
     );
-    res.status(201).send({ status: true, msg: createToken });
+    return res.status(201).send({ status: true, msg: createToken });
   } catch (error) {
-    res.status(500).send({ status: false, msg: error.message });
+    return res.status(500).send({ status: false, msg: error.message });
   }
 };
 

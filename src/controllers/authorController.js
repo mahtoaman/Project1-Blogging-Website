@@ -49,18 +49,14 @@ const createAuthor = async function (req, res) {
         .status(400)
         .send({ status: false, msg: "You're missing title :)" });
 
-    //edgeCase 4.1 --
-    let validTitle = ["Mr", "Mrs", "Miss"];
-    let checkTitle = false;
-    for (let i = 0; i < validTitle.length; i++) {
-      if (title == validTitle[i]) checkTitle = true;
-      break;
-    }
-    if (!checkTitle)
+    //edgeCase 4.1 --is title acc
+    if (title != "Mr" && title != "Mrs" && title != "Miss")
       return res
         .status(400)
-        .send({ status: false, msg: `Title can contain only "Mr","Mrs" or "Miss` });
-    
+        .send({
+          status: false,
+          msg: `Title can contain only "Mr","Mrs" or "Miss`,
+        });
 
     //edgeCase 5 --is e-mail id present and valid
     if (!email) {

@@ -27,7 +27,7 @@ const isAuthenticate = async function (req, res, next) {
       if (bodyAuthotId != decodedToken.authorId)
         return res.status(400).send({
           status: false,
-          message: "provided authorId is not same as logined auhorId",
+          message: "Provided authorId is not same as logined auhorId",
         });
       //===========================================================================
       return next();
@@ -61,7 +61,7 @@ const isAuthorised = async function (req, res, next) {
     if (authorId != decodedToken.authorId) {
       return res.status(403).send({
         status: false,
-        message: "You are not a authorized to perfom this operation",
+        message: "You are not authorized to perfom this operation",
       });
     }
     //if auhtorId from blog and authorId from decodedToken are same...then returning control to next function

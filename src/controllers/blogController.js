@@ -47,9 +47,10 @@ const createBlog = async function (req, res) {
 
     //content should be more than 100 characters
     if (body.length < 50)
-      return res
-        .status(400)
-        .send({ statut: false, msg: "body content is too short...add some more content" });
+      return res.status(400).send({
+        statut: false,
+        msg: "body content is too short...add some more content",
+      });
 
     //edgeCase5 - is body data present or not
     if (!category || category.length == 0)
@@ -86,13 +87,15 @@ const getBlog = async function (req, res) {
           .status(400)
           .send({ status: false, msg: "Not a valid authorId" });
     }
-  //is there any document present for the given details???
+    //is there any document present for the given details???
     let allElement = await blogModel.find({
       $and: [data, { isDeleted: false }, { isPublished: true }],
     });
 
     if (allElement.length == 0)
-      return res.status(404).send({ status: false, msg: "No data found for given user" });
+      return res
+        .status(404)
+        .send({ status: false, msg: "No data found for given user" });
 
     return res.status(200).send({ status: true, msg: allElement });
   } catch (error) {
@@ -127,6 +130,23 @@ const updateBlog = async function (req, res) {
       return res
         .status(400)
         .send({ status: false, msg: "You have not provided any data" });
+
+    ///edgeCase 3 ...body content should be greater than 50
+    if (body) {
+      if (body.length < 50)
+        return res.status(400).send({
+          statut: false,
+          msg: "body content is too short...add some more content",
+        });
+    }
+
+    //edgeCase 4 -- if title is present than it should not be empty
+    if (title != null) {
+      if (title.length == 0)
+        return res
+          .status(400)
+          .send({ statut: false, msg: "Title is is used but it is empty" });
+    }
 
     //updating the blogs with given data
     //this line will update according to data provided in the request boddy
@@ -186,7 +206,9 @@ const deletBlogById = async function (req, res) {
       { $set: { isDeleted: true, deletedAt: new Date() } },
       { new: true }
     );
-    res.status(200).send({ status: "Below document is deleted", data: updatedata });
+    res
+      .status(200)
+      .send({ status: "Below document is deleted", data: updatedata });
   } catch (error) {
     res.status(500).send({ status: false, msg: error.message });
   }

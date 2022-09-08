@@ -50,7 +50,6 @@ const createAuthor = async function (req, res) {
         .status(400)
         .send({ status: false, msg: "You're missing title :)" });
 
-    //edgeCase 4.1 --is title acc
     if (title != "Mr" && title != "Mrs" && title != "Miss")
       return res.status(400).send({
         status: false,
@@ -74,7 +73,7 @@ const createAuthor = async function (req, res) {
     //edgeCase 5.1 -- is email already registered or not
     let inputEmail = await authorModel.findOne({ email });
     if (inputEmail != null)
-      if (email == inputEmail.email)
+      if (email.toLowerCase().trim() == inputEmail.email)
         return res
           .status(400)
           .send({ status: false, msg: "Provided email is already registered" });

@@ -65,10 +65,7 @@ const isAuthorised = async function (req, res, next) {
           .send({ status: false, message: "No blog found with given blogId" });
 
       let authorId = blog.authorId.toString();
-      // console.log(authorId)
-      // console.log(decodedToken.authorId)
-
-      //veryfing authorization
+      
       if (authorId != decodedToken.authorId) {
         return res.status(403).send({
           status: false,

@@ -157,7 +157,7 @@ const loginAuthor = async function (req, res) {
       },
       "authors-secret-key"
     );
-    return res.status(201).send({ status: 'Logined successfully', msg: createToken });
+    return res.status(200).send({ status: 'Logined successfully', msg: createToken });
   } catch (error) {
     return res.status(500).send({ status: false, msg: error.message });
   }

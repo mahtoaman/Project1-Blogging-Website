@@ -1,7 +1,7 @@
 const { query } = require("express");
 const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModel");
-const { isValidId, isValidQuery } = require("../validator/validation");
+const { isValidId, isValidB, isValidBodyody } = require("../validator/validation");
 
 const isAuthenticate = async function (req, res, next) {
   try {
@@ -49,8 +49,7 @@ const isAuthorised = async function (req, res, next) {
     //this one is authorization for delete blog by query.......
     let data = req.query;
 
-    if (isValidQuery(data)) {
-      data["isDeleted"] = false;
+    if (isValidBody(data)) {
       let decodedAuthorId = decodedToken.authorId;
       if (data.authorId != null) {
         if (!isValidId(data.authorId))

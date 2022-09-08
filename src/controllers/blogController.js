@@ -7,7 +7,6 @@ const authorModel = require("../models/authorModel");
 const createBlog = async function (req, res) {
   try {
     let data = req.body;
-    // let published = data.isPublished;
     let { authorId, title, body, category, isPublished } = data;
 
     if (!validator.isValidBody(data)) {
@@ -22,18 +21,15 @@ const createBlog = async function (req, res) {
         .status(400)
         .send({ statut: false, msg: "AuthorId is required" });
 
-    // if (!validator.isValidId(authorId))
-    //   // edgeCase2- provided authorId is correct or not (authorCase2)
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, message: "Invalid AuthoId" });
-
     //edgeCase3 - (authorCase3) if authorId is correct then, is there any author present with given id or not
     let authorPresence = await authorModel.findById(authorId);
     if (!authorPresence)
       return res
         .status(404)
-        .send({ status: false, msg: "Author is not present, given authorId is incorrect" });
+        .send({
+          status: false,
+          msg: "Author is not present, given authorId is incorrect",
+        });
 
     //edgeCase4 - is title present or not
     if (!title)
@@ -53,7 +49,7 @@ const createBlog = async function (req, res) {
       });
 
     //edgeCase5 - is body data present or not
-    if (!category || category.length == 0)
+    if (!category || category.length == 0) 
       return res.status(400).send({ statut: false, msg: "Category is must" });
 
     //adding the key Created at to the data, so that we can log this data in collection
@@ -172,7 +168,7 @@ const updateBlog = async function (req, res) {
       res.status(200).send({ status: true, data: updatedValues });
     }
   } catch (err) {
-    res.status(400).send({ status: false, msg: err.message });
+    res.status(500).send({ status: false, msg: err.message });
   }
 };
 
@@ -214,26 +210,12 @@ const deletBlogById = async function (req, res) {
   }
 };
 
-//====================== DELETE BLOG ========================
+//====================== DELETE BLOG by quries ========================
 
 const deleteBlog = async function (req, res) {
   try {
     let data = req.query;
-
-    //edgeCase1 --is queryParam empty??
-    //if not empty then add a key to "data", "isDeleted" and setting value to trye
-    //to get only blogs which is not deleted yet
-
-    // if (validator.isValidQuery(data)) {
-    //   data["isDeleted"] = false;
-    // } else {
-    //   return res.status(400).send({
-    //     status: false,
-    //     msg: "Please enter at least one query to delete the blog",
-    //   });
-    // }
-
-    //if authorId is given then given then check is it vlid or not
+    data["isDeleted"] = false;
     if (data.authorId) {
       if (!validator.isValidId(data.authorId))
         return res.status(400).send({ status: false, msg: "Invalid authorId" });
@@ -262,7 +244,7 @@ const deleteBlog = async function (req, res) {
       });
     }
   } catch (error) {
-    res.status(400).send({ msg: error.message });
+    res.status(500).send({ msg: error.message });
   }
 };
 

@@ -25,7 +25,7 @@ const createAuthor = async function (req, res) {
       if (!verifyName)
         return res.status(400).send({
           status: false,
-          msg: "First name is too",
+          msg: "First name is invalid",
         });
     }
 
@@ -98,7 +98,7 @@ const createAuthor = async function (req, res) {
       createdData: savedata,
     });
   } catch (error) {
-    res.status(400).send({ status: false, message: error.message });
+    res.status(500).send({ status: false, message: error.message });
   }
 };
 

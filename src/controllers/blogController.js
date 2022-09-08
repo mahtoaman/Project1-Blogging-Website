@@ -9,6 +9,7 @@ const createBlog = async function (req, res) {
     let data = req.body;
     // let published = data.isPublished;
     let { authorId, title, body, category, isPublished } = data;
+    console.log(body)
 
     if (!validator.isValidBody(data)) {
       //checking that body is empty or not
@@ -46,10 +47,10 @@ const createBlog = async function (req, res) {
         .send({ statut: false, msg: "Body is a mandatory part" });
 
     //content should be more than 100 characters
-    if (body.length < 100)
+    if (body.length < 50)
       return res
         .status(400)
-        .send({ statut: false, msg: "Body is a mandatory part" });
+        .send({ statut: false, msg: "body content is too short...add some more content" });
 
     //edgeCase5 - is body data present or not
     if (!category || category.length == 0)

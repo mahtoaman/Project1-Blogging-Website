@@ -38,33 +38,47 @@ const isAuthenticate = async function (req, res, next) {
   }
 };
 
+//=============================AUTHORIZATION ========================================
 const isAuthorised = async function (req, res, next) {
   try {
     let blogId = req.params.blogId;
 
-    if (!isValidId(blogId))
-      return res.status(400).send({ status: false, message: "Invalid blogId" });
+    //this one is authorization for delete blog by query.......
+    let data = req.query;
+    let decodedAuthorId = decodedToken.authorId
+        data['authorId'] = decodedAuthorId.toString()
+//---------------------------------------------------------------
 
-    let blog = await blogModel.findById(blogId);
+//autorization for delete by id and update API
+    if (blogId) {
+      if (!isValidId(blogId))
+        return res
+          .status(400)
+          .send({ status: false, message: "Invalid blogId" });
 
-    //edgeCase1 -- is auhtor present for given blogId
-    if (!blog)
-      return res
-        .status(404)
-        .send({ status: false, message: "No blog found with given blogId" });
+      let blog = await blogModel.findById(blogId);
 
-    let authorId = blog.authorId.toString();
-    // console.log(authorId)
-    // console.log(decodedToken.authorId)
+      //edgeCase1 -- is auhtor present for given blogId
+      if (!blog)
+        return res
+          .status(404)
+          .send({ status: false, message: "No blog found with given blogId" });
 
-    //veryfing authorization
-    if (authorId != decodedToken.authorId) {
-      return res.status(403).send({
-        status: false,
-        message: "You are not authorized to perfom this operation",
-      });
+      let authorId = blog.authorId.toString();
+      // console.log(authorId)
+      // console.log(decodedToken.authorId)
+
+      //veryfing authorization
+      if (authorId != decodedToken.authorId) {
+        return res.status(403).send({
+          status: false,
+          message: "You are not authorized to perfom this operation",
+        });
+      }
+
+      //if auhtorId from blog and authorId from decodedToken are same...then returning control to next function
+      return next();
     }
-    //if auhtorId from blog and authorId from decodedToken are same...then returning control to next function
     return next();
   } catch (error) {
     res.status(500).send({ status: false, message: error.message });

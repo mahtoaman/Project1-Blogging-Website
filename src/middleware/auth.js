@@ -1,7 +1,7 @@
 const { query } = require("express");
 const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModel");
-const { isValidId, isValidB, isValidBodyody } = require("../validator/validation");
+const { isValidId, isValidBody } = require("../validator/validation");
 
 const isAuthenticate = async function (req, res, next) {
   try {

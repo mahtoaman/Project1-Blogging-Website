@@ -25,5 +25,5 @@ const isValidId = function (data) {
   return mongoose.Types.ObjectId.isValid(data);
 };
 
-module.exports = { isValidEmail,isValidName, isValidBody, isValidPassword, isValidId, isValidQuery};
+module.exports = { isValidEmail,isValidName, isValidBody, isValidPassword, isValidId};
 

@@ -56,7 +56,7 @@ const createBlog = async function (req, res) {
       return res.status(400).send({ statut: false, msg: "Category is must" });
 
     //adding the key Created at to the data, so that we can log this data in collection
-    data["createdAt"] = new Date();
+    // data["createdAt"] = new Date();
     let savedata = await blogModel.create(data);
     if (isPublished) {
       let updateDate = await blogModel.findOneAndUpdate(
@@ -86,7 +86,7 @@ const getBlog = async function (req, res) {
           .status(400)
           .send({ status: false, msg: "Not a valid authorId" });
     }
-
+  //is there any document present for the given details???
     let allElement = await blogModel.find({
       $and: [data, { isDeleted: false }, { isPublished: true }],
     });

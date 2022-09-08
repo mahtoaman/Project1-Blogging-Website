@@ -136,12 +136,17 @@ const loginAuthor = async function (req, res) {
         msg: "Password must contain minimum eight characters, at least one upperCase nad lowerCase letter, one number and one special character:",
       });
 
-    //check if password is correct or not
+    //check if password and email are correct or not
     let checkData = await authorModel.findOne({ email: emailId });
+    if (!checkData)
+      return res
+        .status(400)
+        .send({ status: false, msg: "You're not registered, registered first." });
+
     if (password != checkData.password)
       return res.status(404).send({
         status: false,
-        msg: "Password is incorrect",
+        msg: "Incorrect password",
       });
 
     let createToken = jwt.sign(
@@ -152,7 +157,7 @@ const loginAuthor = async function (req, res) {
       },
       "authors-secret-key"
     );
-    return res.status(201).send({ status: true, msg: createToken });
+    return res.status(201).send({ status: 'Logined successfully', msg: createToken });
   } catch (error) {
     return res.status(500).send({ status: false, msg: error.message });
   }

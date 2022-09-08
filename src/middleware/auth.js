@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModel");
 const { isValidId } = require("../validator/validation");
 
-const authenticate = async function (req, res, next) {
+const isAuthenticate = async function (req, res, next) {
   try {
     token = req.headers["x-api-key"];
 
@@ -25,7 +25,7 @@ const authenticate = async function (req, res, next) {
   }
 };
 
-const autherization = async function (req, res, next) {
+const isAuthorised = async function (req, res, next) {
   try {
     let blogId = req.params.blogId;
     if (!isValidId(blogId))
@@ -55,5 +55,5 @@ const autherization = async function (req, res, next) {
   }
 };
 
-module.exports.authenticate = authenticate;
-module.exports.autherization = autherization;
+module.exports.isAuthenticate = isAuthenticate;
+module.exports.isAuthorised = isAuthorised;

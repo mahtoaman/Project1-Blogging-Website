@@ -25,7 +25,7 @@ const createAuthor = async function (req, res) {
       if (!verifyName)
         return res.status(400).send({
           status: false,
-          msg: "First name is not valid",
+          msg: "First name is too",
         });
     }
 

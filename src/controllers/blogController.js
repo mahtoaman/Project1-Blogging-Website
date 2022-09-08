@@ -9,13 +9,12 @@ const createBlog = async function (req, res) {
     let data = req.body;
     // let published = data.isPublished;
     let { authorId, title, body, category, isPublished } = data;
-    console.log(body)
 
     if (!validator.isValidBody(data)) {
       //checking that body is empty or not
       return res
         .status(400)
-        .send({ status: false, msg: "Please input detait is required" });
+        .send({ status: false, msg: "Body cannot be empty" });
     }
     if (!authorId)
       //edgeCase1 - checks if authorId is provided in body or not (authorCase1)
@@ -44,7 +43,7 @@ const createBlog = async function (req, res) {
     if (!body)
       return res
         .status(400)
-        .send({ statut: false, msg: "Body is a mandatory part" });
+        .send({ statut: false, msg: "Body content is a mandatory part" });
 
     //content should be more than 100 characters
     if (body.length < 50)
@@ -93,7 +92,7 @@ const getBlog = async function (req, res) {
     });
 
     if (allElement.length == 0)
-      return res.status(404).send({ status: false, msg: "Data not found" });
+      return res.status(404).send({ status: false, msg: "No data found for given user" });
 
     return res.status(200).send({ status: true, msg: allElement });
   } catch (error) {
@@ -187,7 +186,7 @@ const deletBlogById = async function (req, res) {
       { $set: { isDeleted: true, deletedAt: new Date() } },
       { new: true }
     );
-    res.status(200).send({ status: true, data: updatedata });
+    res.status(200).send({ status: "Below document is deleted", data: updatedata });
   } catch (error) {
     res.status(500).send({ status: false, msg: error.message });
   }

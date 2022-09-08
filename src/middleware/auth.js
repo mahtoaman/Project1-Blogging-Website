@@ -8,9 +8,10 @@ const isAuthenticate = async function (req, res, next) {
 
     //edgeCase1 -- is token present or not
     if (!token) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Token is missing" });
+      return res.status(400).send({
+        status: false,
+        message: "You're not logined, Your token is missing",
+      });
     }
     //if token is present then decoding the token
     decodedToken = jwt.verify(token, "authors-secret-key");
@@ -18,6 +19,18 @@ const isAuthenticate = async function (req, res, next) {
       return res
         .status(400)
         .send({ status: false, message: "Not a Valid Token" });
+    }
+
+    //======validation for creating blog===========================================
+    let bodyAuthotId = req.body.authorId;
+    if (bodyAuthotId) {
+      if (bodyAuthotId != decodedToken.authorId)
+        return res.status(400).send({
+          status: false,
+          message: "provided authorId is not same as logined auhorId",
+        });
+      //===========================================================================
+      return next();
     }
     return next();
   } catch (error) {
@@ -28,6 +41,7 @@ const isAuthenticate = async function (req, res, next) {
 const isAuthorised = async function (req, res, next) {
   try {
     let blogId = req.params.blogId;
+
     if (!isValidId(blogId))
       return res.status(400).send({ status: false, message: "Invalid blogId" });
 
@@ -37,9 +51,11 @@ const isAuthorised = async function (req, res, next) {
     if (!blog)
       return res
         .status(404)
-        .send({ status: false, message: "Author not found with given blogId" });
+        .send({ status: false, message: "No blog found with given blogId" });
 
     let authorId = blog.authorId.toString();
+    // console.log(authorId)
+    // console.log(decodedToken.authorId)
 
     //veryfing authorization
     if (authorId != decodedToken.authorId) {

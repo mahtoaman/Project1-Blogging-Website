@@ -22,18 +22,18 @@ const createBlog = async function (req, res) {
         .status(400)
         .send({ statut: false, msg: "AuthorId is required" });
 
-    if (!validator.isValidId(authorId))
-      // edgeCase2- provided authorId is correct or not (authorCase2)
-      return res
-        .status(400)
-        .send({ status: false, message: "Invalid AuthoId" });
+    // if (!validator.isValidId(authorId))
+    //   // edgeCase2- provided authorId is correct or not (authorCase2)
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Invalid AuthoId" });
 
     //edgeCase3 - (authorCase3) if authorId is correct then, is there any author present with given id or not
     let authorPresence = await authorModel.findById(authorId);
     if (!authorPresence)
       return res
         .status(404)
-        .send({ status: false, msg: "Author is not present" });
+        .send({ status: false, msg: "Author is not present, given authorId is incorrect" });
 
     //edgeCase4 - is title present or not
     if (!title)
@@ -110,7 +110,7 @@ const updateBlog = async function (req, res) {
     let data = req.body;
     let blogId = req.params["blogId"];
 
-    let { title, body, tags, subCategory } = data;
+    let { title, body, tags, subcategory } = data;
 
     //edgeCase 1 --is validBlogId
     if (!validator.isValidId(blogId))
@@ -151,13 +151,13 @@ const updateBlog = async function (req, res) {
     //updating the blogs with given data
     //this line will update according to data provided in the request boddy
     //if data is not provided then it will not update that value
-    if (title || body || tags || subCategory) {
+    if (title || body || tags || subcategory) {
       let updatedValues = await blogModel.findOneAndUpdate(
         { _id: blogId },
         {
           $push: {
             tags: tags,
-            subcategory: subCategory,
+            subcategory: subcategory,
           },
           $set: {
             title: title,
@@ -224,14 +224,14 @@ const deleteBlog = async function (req, res) {
     //if not empty then add a key to "data", "isDeleted" and setting value to trye
     //to get only blogs which is not deleted yet
 
-    if (validator.isValidQuery(data)) {
-      data["isDeleted"] = false;
-    } else {
-      return res.status(400).send({
-        status: false,
-        msg: "Please enter at least one query to delete the blog",
-      });
-    }
+    // if (validator.isValidQuery(data)) {
+    //   data["isDeleted"] = false;
+    // } else {
+    //   return res.status(400).send({
+    //     status: false,
+    //     msg: "Please enter at least one query to delete the blog",
+    //   });
+    // }
 
     //if authorId is given then given then check is it vlid or not
     if (data.authorId) {

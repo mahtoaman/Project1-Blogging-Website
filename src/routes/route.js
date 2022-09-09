@@ -12,7 +12,7 @@ router.get("/test-me", function (req, res) {
 router.post("/authors", authorController.createAuthor);
 router.post("/blogs", isAuthenticate,blogController.createBlog);
 
-router.get("/filterBlog", isAuthenticate, blogController.getBlog);
+router.get("/Blog", isAuthenticate, blogController.getBlog);
 router.put("/blogs/:blogId",isAuthenticate, isAuthorised, blogController.updateBlog); //UPDATE API
 
 router.delete("/blogs/:blogId",isAuthenticate, isAuthorised, blogController.deletBlogById);

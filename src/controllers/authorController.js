@@ -8,8 +8,7 @@ const createAuthor = async function (req, res) {
     let { fname, lname, title, email, password } = data;
 
     //edgeCase 1 --is requestBody empty
-    let isEmptyBody = validator.isValidBody(data);
-    if (!isEmptyBody)
+    if (!validator.isValidBody(data))
       return res
         .status(400)
         .send({ status: false, msg: "Request body cannot be empty" });
@@ -21,8 +20,7 @@ const createAuthor = async function (req, res) {
         .send({ status: false, msg: "First name is required" });
 
     if (fname) {
-      let verifyName = validator.isValidName(fname);
-      if (!verifyName)
+      if (!validator.isValidName(fname))
         return res.status(400).send({
           status: false,
           msg: "First name is invalid",
@@ -36,8 +34,7 @@ const createAuthor = async function (req, res) {
         .send({ status: false, msg: "Last name is required" });
 
     if (lname) {
-      let verifyName = validator.isValidName(lname);
-      if (!verifyName)
+      if (!validator.isValidName(lname))
         return res.status(400).send({
           status: false,
           msg: "Last name is not valid",
@@ -63,8 +60,7 @@ const createAuthor = async function (req, res) {
         .send({ status: false, msg: "Hey! You're missing email id :)" });
     }
     if (email) {
-      let verifyEmail = validator.isValidEmail(email.trim());
-      if (!verifyEmail)
+      if (!validator.isValidEmail(email.trim()))
         return res.status(400).send({
           status: false,
           msg: "This is not a valid syntax for email id, plsease try again",
@@ -116,7 +112,7 @@ const loginAuthor = async function (req, res) {
         .send({ status: false, msg: "Email Id is required" });
 
     //edgeCase2 --is valid email syntax
-    if (!validator.isValidEmail(emailId))
+    if (!validator.isValidEmail(emailId.toLowerCase().trim()))
       return res.status(400).send({
         status: false,
         msg: "This is not a valid syntax for email id, plsease try again",
@@ -156,7 +152,7 @@ const loginAuthor = async function (req, res) {
       },
       "authors-secret-key"
     );
-    return res.status(200).send({ status: 'Logined successfully', msg: createToken });
+    return res.status(201).send({ status: 'Logined successfully', msg: createToken });
   } catch (error) {
     return res.status(500).send({ status: false, msg: error.message });
   }

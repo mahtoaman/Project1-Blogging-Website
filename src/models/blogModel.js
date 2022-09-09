@@ -1,11 +1,12 @@
 const mongoose=require('mongoose')
-const authorModel = require('./authorModel')
 const ObjectId = mongoose.Schema.Types.ObjectId
 
 const blogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
+      trim:true
+      
      // required: true,
     },
     body: {

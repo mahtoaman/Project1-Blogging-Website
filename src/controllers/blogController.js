@@ -9,8 +9,8 @@ const createBlog = async function (req, res) {
     let data = req.body;
     let { authorId, title, body, category, isPublished } = data;
 
+    //checking that body is empty or not
     if (!validator.isValidBody(data)) {
-      //checking that body is empty or not
       return res
         .status(400)
         .send({ status: false, msg: "Body cannot be empty" });
@@ -32,7 +32,7 @@ const createBlog = async function (req, res) {
         });
 
     //edgeCase4 - is title present or not
-    if (!title)
+    if (!title.trim().length)
       return res.status(400).send({ statut: false, msg: "Title is required" });
 
     //edgeCase5 - is body data present or not
@@ -138,7 +138,7 @@ const updateBlog = async function (req, res) {
 
     //edgeCase 4 -- if title is present than it should not be empty
     if (title != null) {
-      if (title.length == 0)
+      if (title.trim(.0).length == 0)
         return res
           .status(400)
           .send({ statut: false, msg: "Title is is used but it is empty" });

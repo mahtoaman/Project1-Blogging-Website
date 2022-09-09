@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 const blogModel = require("../models/blogModel");
 const { isValidId, isValidBody } = require("../validator/validation");
 
+//=======================================AUTHENTICATION=============================
 const isAuthenticate = async function (req, res, next) {
   try {
     token = req.headers["x-api-key"];
-
     //edgeCase1 -- is token present or not
     if (!token) {
       return res.status(400).send({
@@ -48,9 +48,9 @@ const isAuthorised = async function (req, res, next) {
     //---------------------------------------------------------------
     //this one is authorization for delete blog by query.......
     let data = req.query;
+    let decodedAuthorId = decodedToken.authorId;
 
     if (isValidBody(data)) {
-      let decodedAuthorId = decodedToken.authorId;
       if (data.authorId != null) {
         if (!isValidId(data.authorId))
           return res
@@ -59,7 +59,7 @@ const isAuthorised = async function (req, res, next) {
 
         if (data.authorId != decodedAuthorId)
           return res
-            .status(400)
+            .status(403)
             .send({ status: false, msg: `You cannot delete other's data.` });
       }
       data["authorId"] = decodedAuthorId.toString();

@@ -24,12 +24,10 @@ const createBlog = async function (req, res) {
     //edgeCase3 - (authorCase3) if authorId is correct then, is there any author present with given id or not
     let authorPresence = await authorModel.findById(authorId);
     if (!authorPresence)
-      return res
-        .status(404)
-        .send({
-          status: false,
-          msg: "Author is not present, given authorId is incorrect",
-        });
+      return res.status(404).send({
+        status: false,
+        msg: "Author is not present, given authorId is incorrect",
+      });
 
     //edgeCase4 - is title present or not
     if (!title.trim().length)
@@ -49,7 +47,7 @@ const createBlog = async function (req, res) {
       });
 
     //edgeCase5 - is body data present or not
-    if (!category || category.length == 0) 
+    if (!category || category.length == 0)
       return res.status(400).send({ statut: false, msg: "Category is must" });
 
     //adding the key Created at to the data, so that we can log this data in collection
@@ -109,17 +107,25 @@ const updateBlog = async function (req, res) {
     let { title, body, tags, subcategory } = data;
 
     //edgeCase 1 --is validBlogId
-    if (!validator.isValidId(blogId))
-      return res
-        .status(400)
-        .send({ status: false, message: "Not a valid blogId" });
+    // if (!validator.isValidId(blogId))
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Not a valid blogId" });
 
-    let checkBlog = await blogModel.findOne({ _id: blogId });
-    if (!checkBlog)
-      return res
-        .status(400)
-        .send({ status: false, msg: "No blog found with given Id to update" });
+    // let checkBlog = await blogModel.findOne({ _id: blogId });
+    // console.log(checkBlog);
+    // if (!checkBlog)
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, msg: "No blog found with given Id to update" });
 
+    // //================================AUTHORIZATION ====================================
+
+    // if (req.headers.authorId != checkBlog.authorId.toString()) {
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, msg: "You are not authorised...." });
+    // }
     //edgeCase 2 --is emptyBody
     let emptyBody = validator.isValidBody(data);
     if (!emptyBody)
@@ -138,7 +144,7 @@ const updateBlog = async function (req, res) {
 
     //edgeCase 4 -- if title is present than it should not be empty
     if (title != null) {
-      if (title.trim(.0).length == 0)
+      if (title.trim(0.0).length == 0)
         return res
           .status(400)
           .send({ statut: false, msg: "Title is is used but it is empty" });

@@ -5,13 +5,12 @@ const blogSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      trim:true
-      
-     // required: true,
+      trim:true,
+     required: true,
     },
     body: {
       type: String,
-      //reuired: true,
+      reuired: true,
     },
     authorId: { type: ObjectId, 
       ref: 'author'

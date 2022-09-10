@@ -193,12 +193,21 @@ const deletBlogById = async function (req, res) {
   }
 };
 
-//====================== DELETE BLOG by quries ========================
+//====================== DELETE BLOG by QURIES ========================
 
 const deleteBlog = async function (req, res) {
   try {
     let data = req.query;
+    let {isPublished} = data
+    
     data["isDeleted"] = false;
+
+    if (isPublished && !["true", "false"].includes(isPublished)) {
+      return res.status(400).send({
+        status: false,
+        message: `isPublished can accept value: "true" or "false"`,
+      });
+    }
 
     let deleteByQuery = await blogModel.updateMany(
       data,

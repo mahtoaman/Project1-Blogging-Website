@@ -1,11 +1,11 @@
 const authorModel = require("../models/authorModel");
+const jwt = require("jsonwebtoken");
 const {
   isValidBody,
   isValidEmail,
   isValidName,
   isValidPassword,
 } = require("../validator/validation");
-const jwt = require("jsonwebtoken");
 
 const createAuthor = async function (req, res) {
   try {
@@ -18,28 +18,22 @@ const createAuthor = async function (req, res) {
         .send({ status: false, msg: "Request body cannot be empty" });
 
     if (!fname || !isValidName(fname))
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "First name is required in a valid format",
-        });
+      return res.status(400).send({
+        status: false,
+        msg: "First name is required in a valid format",
+      });
 
     if (!lname || !isValidName(lname))
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "Last name is required in a valid format",
-        });
+      return res.status(400).send({
+        status: false,
+        msg: "Last name is required in a valid format",
+      });
 
     if (!title || (title != "Mr" && title != "Mrs" && title != "Miss"))
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: `Title is required in given format, format: "Mr","Mrs" or "Miss`,
-        });
+      return res.status(400).send({
+        status: false,
+        msg: `Title is required in given format, format: "Mr","Mrs" or "Miss`,
+      });
 
     if (!email || !isValidEmail(email.trim())) {
       return res
@@ -54,12 +48,10 @@ const createAuthor = async function (req, res) {
         .send({ status: false, msg: "Provided email is already registered" });
 
     if (!password || !isValidPassword(password))
-      return res
-        .status(400)
-        .send({
-          status: false,
-          msg: "Password is required with these conditions: at least one upperCase, lowerCase letter, one number and one special character",
-        });
+      return res.status(400).send({
+        status: false,
+        msg: "Password is required with these conditions: at least one upperCase, lowerCase letter, one number and one special character",
+      });
 
     let savedata = await authorModel.create(data);
     res.status(201).send({
@@ -78,28 +70,23 @@ const loginAuthor = async function (req, res) {
     let emailId = req.body.email;
     let password = req.body.password;
 
-    //edgeCase1 - is email id present or not
-   if (!email || !isValidEmail(email.trim())) {
-     return res
-       .status(400)
-       .send({ status: false, msg: "email is required in a valid format" });
-   }
-    //edgeCase3 -- is password given
-      if (!password || !isValidPassword(password))
-        return res.status(400).send({
-          status: false,
-          msg: "Password is required with these conditions: at least one upperCase, lowerCase letter, one number and one special character",
-        });
-
-    //check if password and email are correct or not
-    let checkData = await authorModel.findOne({ email: emailId });
-    if (!checkData)
+    if (!email || !isValidEmail(email.trim())) {
       return res
         .status(400)
-        .send({
-          status: false,
-          msg: "You're not registered, registered first.",
-        });
+        .send({ status: false, msg: "email is required in a valid format" });
+    }
+    if (!password || !isValidPassword(password))
+      return res.status(400).send({
+        status: false,
+        msg: "Password is required with these conditions: at least one upperCase, lowerCase letter, one number and one special character",
+      });
+
+    let checkData = await authorModel.findOne({ email: emailId });
+    if (!checkData)
+      return res.status(400).send({
+        status: false,
+        msg: "You're not registered, registered first.",
+      });
 
     if (password != checkData.password)
       return res.status(404).send({

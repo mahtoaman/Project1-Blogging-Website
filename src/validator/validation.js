@@ -12,7 +12,7 @@ const isValidPassword = function (pass) {
 };
 
 const isValidName = function(name){
-  if (/^[A-Za-z]{3,35}/.test(name)) return true
+  if (/^[A-Za-z]{1,35}/.test(name)) return true
   return false
 }
 

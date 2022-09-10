@@ -1,5 +1,10 @@
 const authorModel = require("../models/authorModel");
-const validator = require("../validator/validation");
+const {
+  isValidBody,
+  isValidEmail,
+  isValidName,
+  isValidPassword,
+} = require("../validator/validation");
 const jwt = require("jsonwebtoken");
 
 const createAuthor = async function (req, res) {
@@ -7,90 +12,57 @@ const createAuthor = async function (req, res) {
     let data = req.body;
     let { fname, lname, title, email, password } = data;
 
-    //edgeCase 1 --is requestBody empty
-    if (!validator.isValidBody(data))
+    if (!isValidBody(data))
       return res
         .status(400)
         .send({ status: false, msg: "Request body cannot be empty" });
 
-    //edgeCase 2 -- is firstName provided or not
-    if (!fname)
+    if (!fname || !isValidName(fname))
       return res
         .status(400)
-        .send({ status: false, msg: "First name is required" });
-
-    if (fname) {
-      if (!validator.isValidName(fname))
-        return res.status(400).send({
+        .send({
           status: false,
-          msg: "First name is invalid",
+          msg: "First name is required in a valid format",
         });
-    }
 
-    //edgeCase 3 -- is lastName provided or not
-    if (!lname)
+    if (!lname || !isValidName(lname))
       return res
         .status(400)
-        .send({ status: false, msg: "Last name is required" });
-
-    if (lname) {
-      if (!validator.isValidName(lname))
-        return res.status(400).send({
+        .send({
           status: false,
-          msg: "Last name is not valid",
+          msg: "Last name is required in a valid format",
         });
-    }
 
-    //edgeCase 4 -- is title valid
-    if (!title)
+    if (!title || (title != "Mr" && title != "Mrs" && title != "Miss"))
       return res
         .status(400)
-        .send({ status: false, msg: "You're missing title :)" });
-
-    if (title != "Mr" && title != "Mrs" && title != "Miss")
-      return res.status(400).send({
-        status: false,
-        msg: `Title can contain only "Mr","Mrs" or "Miss`,
-      });
-
-    //edgeCase 5 --is e-mail id present and valid
-    if (!email) {
-      return res
-        .status(400)
-        .send({ status: false, msg: "Hey! You're missing email id :)" });
-    }
-    if (email) {
-      if (!validator.isValidEmail(email.trim()))
-        return res.status(400).send({
+        .send({
           status: false,
-          msg: "This is not a valid syntax for email id, plsease try again",
+          msg: `Title is required in given format, format: "Mr","Mrs" or "Miss`,
         });
-    }
-    //edgeCase 5.1 -- is email already registered or not
-    let inputEmail = await authorModel.findOne({ email });
-    if (inputEmail != null)
-      if (email.toLowerCase().trim() == inputEmail.email)
-        return res
-          .status(400)
-          .send({ status: false, msg: "Provided email is already registered" });
-
-    // edgeCase 6 -- checking validation of password
-    if (!password)
+    if (!email || !isValidEmail(email.trim())) {
       return res
         .status(400)
-        .send({ status: false, msg: "Password is required" });
+        .send({ status: false, msg: "email is required in a valid format" });
+    }
 
-    //edgeCase7 --checking password or valid or not
-    if (!validator.isValidPassword(password))
-      return res.status(400).send({
-        status: false,
-        msg: "Password must contain minimum eight characters, at least one upperCase nad lowerCase letter, one number and one special character:",
-      });
+    let inputEmail = await authorModel.findOne({ email: email });
+    if (inputEmail && email.toLowerCase().trim() == inputEmail.email)
+      return res
+        .status(400)
+        .send({ status: false, msg: "Provided email is already registered" });
 
-    //creating collection
+    if (!password || !isValidPassword(password))
+      return res
+        .status(400)
+        .send({
+          status: false,
+          msg: "Password is required with these conditions: at least one upperCase, lowerCase letter, one number and one special character",
+        });
+
     let savedata = await authorModel.create(data);
     res.status(201).send({
-      status: "Congratulations, your data is created",
+      status: false,
       createdData: savedata,
     });
   } catch (error) {
@@ -106,37 +78,27 @@ const loginAuthor = async function (req, res) {
     let password = req.body.password;
 
     //edgeCase1 - is email id present or not
-    if (!emailId)
-      return res
-        .status(400)
-        .send({ status: false, msg: "Email Id is required" });
-
-    //edgeCase2 --is valid email syntax
-    if (!validator.isValidEmail(emailId.toLowerCase().trim()))
-      return res.status(400).send({
-        status: false,
-        msg: "This is not a valid syntax for email id, plsease try again",
-      });
-
+   if (!email || !isValidEmail(email.trim())) {
+     return res
+       .status(400)
+       .send({ status: false, msg: "email is required in a valid format" });
+   }
     //edgeCase3 -- is password given
-    if (!password)
-      return res
-        .status(400)
-        .send({ status: false, msg: "Password is required" });
-
-    //edgeCase4 -- is valid syntax of password
-    if (!validator.isValidPassword(password))
-      return res.status(400).send({
-        status: false,
-        msg: "Password must contain minimum eight characters, at least one upperCase nad lowerCase letter, one number and one special character:",
-      });
+      if (!password || !isValidPassword(password))
+        return res.status(400).send({
+          status: false,
+          msg: "Password is required with these conditions: at least one upperCase, lowerCase letter, one number and one special character",
+        });
 
     //check if password and email are correct or not
     let checkData = await authorModel.findOne({ email: emailId });
     if (!checkData)
       return res
         .status(400)
-        .send({ status: false, msg: "You're not registered, registered first." });
+        .send({
+          status: false,
+          msg: "You're not registered, registered first.",
+        });
 
     if (password != checkData.password)
       return res.status(404).send({
@@ -152,7 +114,9 @@ const loginAuthor = async function (req, res) {
       },
       "authors-secret-key"
     );
-    return res.status(201).send({ status: 'Logined successfully', msg: createToken });
+    return res
+      .status(201)
+      .send({ status: "Logined successfully", msg: createToken });
   } catch (error) {
     return res.status(500).send({ status: false, msg: error.message });
   }

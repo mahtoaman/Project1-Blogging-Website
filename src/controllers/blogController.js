@@ -103,32 +103,9 @@ const updateBlog = async function (req, res) {
   try {
     let data = req.body;
     let blogId = req.params["blogId"];
-
     let { title, body, tags, subcategory } = data;
 
-    //edgeCase 1 --is validBlogId
-    // if (!validator.isValidId(blogId))
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, message: "Not a valid blogId" });
-
-    // let checkBlog = await blogModel.findOne({ _id: blogId });
-    // console.log(checkBlog);
-    // if (!checkBlog)
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, msg: "No blog found with given Id to update" });
-
-    // //================================AUTHORIZATION ====================================
-
-    // if (req.headers.authorId != checkBlog.authorId.toString()) {
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, msg: "You are not authorised...." });
-    // }
-    //edgeCase 2 --is emptyBody
-    let emptyBody = validator.isValidBody(data);
-    if (!emptyBody)
+    if (!validator.isValidBody(data))
       return res
         .status(400)
         .send({ status: false, msg: "You have not provided any data" });
@@ -222,12 +199,7 @@ const deleteBlog = async function (req, res) {
   try {
     let data = req.query;
     data["isDeleted"] = false;
-    if (data.authorId) {
-      if (!validator.isValidId(data.authorId))
-        return res.status(400).send({ status: false, msg: "Invalid authorId" });
-    }
 
-    //now delete the blogs with provided details
     let deleteByQuery = await blogModel.updateMany(
       data,
       {
@@ -236,14 +208,11 @@ const deleteBlog = async function (req, res) {
       { new: true }
     );
 
-    //is modified count zero....then sending response- no blogs to delete
     if (deleteByQuery.modifiedCount == 0) {
       return res
         .status(404)
         .send({ status: false, msg: "No blogs to delete with given queries" });
-    }
-    //if modified count is greater than zero then return modified count with message
-    else {
+    } else {
       return res.status(200).send({
         status: true,
         msg: `${deleteByQuery.modifiedCount} Blogs deleted with given queries`,

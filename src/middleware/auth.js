@@ -36,14 +36,14 @@ const isAuthenticate = async function (req, res, next) {
 
 const isAuthorised = async function (req, res, next) {
   try {
-    let blogId = req.params.blogId;
+    blogId = req.params.blogId;
 
     if (!isValidId(blogId))
       return res
         .status(400)
         .send({ status: false, message: "Not a valid blogId" });
 
-    let checkBlog = await blogModel.findOne({ _id: blogId });
+    let checkBlog = await blogModel.findOne({ _id: blogId, isDeleted: false });
     if (!checkBlog)
       return res
         .status(400)
@@ -52,7 +52,7 @@ const isAuthorised = async function (req, res, next) {
     if (req.headers.authorId != checkBlog.authorId.toString()) {
       return res
         .status(400)
-        .send({ status: false, msg: "You are not authorised...." });
+        .send({ status: false, msg: "You are not authorised" });
     }
     next();
   } catch {
@@ -73,7 +73,10 @@ const isAutForQuery = async function (req, res, next) {
         .send({ status: false, msg: "You cannot send empty request" });
     }
 
-    if (authorId && (!isValidId(authorId) || authorId != req.headers.authorId)){
+    if (
+      authorId &&
+      (!isValidId(authorId) || authorId != req.headers.authorId)
+    ) {
       return res
         .status(403)
         .send({ status: false, msg: "You are not authorized person" });

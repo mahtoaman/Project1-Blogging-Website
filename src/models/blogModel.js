@@ -10,10 +10,11 @@ const blogSchema = new mongoose.Schema(
     },
     body: {
       type: String,
-      reuired: true,
+      required: true,
     },
     authorId: { type: ObjectId, 
-      ref: 'author'
+      ref: 'author',
+      required:true
      },
     tags: {
       type: [String],

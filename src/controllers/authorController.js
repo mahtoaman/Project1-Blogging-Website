@@ -67,7 +67,7 @@ const createAuthor = async function (req, res) {
 
 const loginAuthor = async function (req, res) {
   try {
-    let emailId = req.body.email;
+    let email = req.body.email;
     let password = req.body.password;
 
     if (!email || !isValidEmail(email.trim())) {
@@ -81,7 +81,7 @@ const loginAuthor = async function (req, res) {
         msg: "Password is required with these conditions: at least one upperCase, lowerCase letter, one number and one special character",
       });
 
-    let checkData = await authorModel.findOne({ email: emailId });
+    let checkData = await authorModel.findOne({ email: email });
     if (!checkData)
       return res.status(400).send({
         status: false,
@@ -104,7 +104,7 @@ const loginAuthor = async function (req, res) {
     );
     return res
       .status(201)
-      .send({ status: "Logined successfully", msg: createToken });
+      .send({ status: true, msg: createToken });
   } catch (error) {
     return res.status(500).send({ status: false, msg: error.message });
   }

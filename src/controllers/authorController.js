@@ -40,6 +40,7 @@ const createAuthor = async function (req, res) {
           status: false,
           msg: `Title is required in given format, format: "Mr","Mrs" or "Miss`,
         });
+
     if (!email || !isValidEmail(email.trim())) {
       return res
         .status(400)
@@ -47,7 +48,7 @@ const createAuthor = async function (req, res) {
     }
 
     let inputEmail = await authorModel.findOne({ email: email });
-    if (inputEmail && email.toLowerCase().trim() == inputEmail.email)
+    if (inputEmail)
       return res
         .status(400)
         .send({ status: false, msg: "Provided email is already registered" });

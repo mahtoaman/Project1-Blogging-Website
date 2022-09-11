@@ -74,11 +74,6 @@ const getBlog = async function (req, res) {
         .send({ status: false, msg: "Not a valid authorId" });
     }
 
-    // if (!req.params.authorId)
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, msg: "AuthroId is not given" });
-
     let allElement = await blogModel.find({
       $and: [data, { isDeleted: false }, { isPublished: true }],
     });

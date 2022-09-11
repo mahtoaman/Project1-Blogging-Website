@@ -49,8 +49,8 @@ const createBlog = async function (req, res) {
     if (!category || category.length == 0)
       return res.status(400).send({ statut: false, msg: "Category is must" });
 
-    if (data.isPublished) {
-      data["isPublished"] = new Date();
+    if (isPublished) {
+      data["isPublishedAt"] = new Date();
     }
 
     let savedata = await blogModel.create(data);
@@ -110,11 +110,12 @@ const updateBlog = async function (req, res) {
       });
     }
 
-    if (!title && title.trim().length == 0) {
+    if (title && title.trim().length == 0) {
       return res
         .status(400)
         .send({ statut: false, msg: "Title is used but it is empty" });
     }
+
 
     if (title || body || tags || subcategory) {
       let updatedValues = await blogModel.findOneAndUpdate(

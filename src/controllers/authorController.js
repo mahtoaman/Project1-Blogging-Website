@@ -55,8 +55,9 @@ const createAuthor = async function (req, res) {
 
     let savedata = await authorModel.create(data);
     res.status(201).send({
-      status: false,
-      createdData: savedata,
+      status: true,
+      msg:"Author created succesfully",
+      data: savedata,
     });
   } catch (error) {
     res.status(500).send({ status: false, message: error.message });
@@ -89,7 +90,7 @@ const loginAuthor = async function (req, res) {
       });
 
     if (password != checkData.password)
-      return res.status(404).send({
+      return res.status(400).send({
         status: false,
         msg: "Incorrect password",
       });
@@ -104,7 +105,7 @@ const loginAuthor = async function (req, res) {
     );
     return res
       .status(201)
-      .send({ status: true, msg: createToken });
+      .send({ status: true,msg:"Token Created Succesfully", data:{ token: createToken }});
   } catch (error) {
     return res.status(500).send({ status: false, msg: error.message });
   }

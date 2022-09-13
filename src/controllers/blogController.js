@@ -31,8 +31,8 @@ const createBlog = async function (req, res) {
         status: false,
         msg: "You cannot create blog using others authorId",
       });
-
-    if (!title.trim().length)
+     
+    if (!title||title.trim().length==0)
       return res.status(400).send({ statut: false, msg: "Title is required" });
 
     if (!body)
@@ -54,7 +54,7 @@ const createBlog = async function (req, res) {
     }
 
     let savedata = await blogModel.create(data);
-    res.status(201).send({ status: true, msg: savedata });
+    res.status(201).send({ status: true, msg:"Blog Create Succesfully", data: savedata });
   } catch (error) {
     res.status(500).send({ msg: error.message });
   }
@@ -65,7 +65,7 @@ const createBlog = async function (req, res) {
 const getBlog = async function (req, res) {
   try {
     let data = req.query;
-    console.log(data);
+    // console.log(data);
     let { authorId } = data;
 
     if (authorId && !validator.isValidId(authorId)) {
@@ -83,7 +83,7 @@ const getBlog = async function (req, res) {
         .status(404)
         .send({ status: false, msg: "No data found for given user" });
 
-    return res.status(200).send({ status: true, msg: allElement });
+    return res.status(200).send({ status: true,msg:"Required blog is given below" ,data: allElement });
   } catch (error) {
     res.status(500).send({ status: false, msg: error.message });
   }
@@ -135,7 +135,7 @@ const updateBlog = async function (req, res) {
         },
         { new: true }
       );
-      return res.status(200).send({ status: true, data: updatedValues });
+      return res.status(200).send({ status: true, message: "Blog update is successfu",data: updatedValues });
     }
   } catch (err) {
     return res.status(500).send({ status: false, msg: err.message });
